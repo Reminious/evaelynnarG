@@ -6,34 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ListView
+        android:id="@+id/listView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        tools:layout_editor_absoluteX="0dp"
-        tools:layout_editor_absoluteY="0dp">
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/top"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toTopOf="@+id/bottom"
-            app:layout_constraintHeight_percent="0.3"
-            android:layout_gravity="center"
-            android:background="#788BD9"
-            android:text="Top"
-            android:textSize="20sp" />
-
-        <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/bottom"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            app:layout_constraintHeight_percent="0.7"
-            app:layout_constraintTop_toBottomOf="@+id/top"
-            android:background="#FFA48D"
-            android:text="Bottom"
-            android:textSize="20sp" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
+        android:divider="#e5e5ff"
+        android:dividerHeight="1dp">
+    </ListView>
 </androidx.constraintlayout.widget.ConstraintLayout>
