@@ -8,8 +8,9 @@ android {
 
     defaultConfig {
         applicationId "com.example.helloworld"
-        minSdk 29
-        targetSdk 34
+        minSdk 27
+        //noinspection ExpiredTargetSdkVersion
+        targetSdk 29
         versionCode 1
         versionName "1.0"
 
@@ -35,6 +36,9 @@ dependencies {
     implementation libs.activity
     implementation libs.constraintlayout
     implementation libs.filament.android
+    implementation libs.jsoup
+    implementation libs.glide.core
+    annotationProcessor libs.glide.compiler
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core

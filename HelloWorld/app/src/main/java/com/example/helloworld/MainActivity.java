@@ -1,5 +1,6 @@
 package com.example.helloworld;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import androidx.activity.EdgeToEdge;
@@ -7,17 +8,32 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
+
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 
-public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity {
 
-    private final String[] pics = {"haha1", "haha2", "haha3", "launch", "yeah"};
-    private final String[] captions = {"haha1", "haha2", "haha3", "launch", "yeah"};
+    private Executor executor= Executors.newSingleThreadExecutor();
+    private Handler handler = new Handler(Looper.getMainLooper());
+    private ListView listView;
+    private ImageAdapter adapter;
+    private String[] imageArray = new String[20];
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,12 +41,20 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        MyCustomAdapter adapter = new MyCustomAdapter(this, pics, captions);
-        ListView listView = findViewById(R.id.listView);
-        if(listView != null) {
+        adapter = new ImageAdapter(this, imageArray);
+        listView = findViewById(R.id.listView);
+        if (listView != null) {
             listView.setAdapter(adapter);
-            listView.setOnItemClickListener(this);
         }
+        findViewById(R.id.loadButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                displayImageTask("https://stocksnap.io/");
+                //https://stocksnap.io/
+                //https://www.istockphoto.com/photos/singapore/
+                //https://pixabay.com/
+            }
+        });
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -39,8 +63,28 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         });
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Toast.makeText(this, "You clicked " + captions[position], Toast.LENGTH_SHORT).show();
+    private void displayImageTask(String url) {
+        executor.execute(() -> {
+            List<String> imageUrls = new ArrayList<>();
+            try {
+                Document doc = Jsoup.connect(url).get();
+                //Log.d("wtf", "DownloadImageTask: " + doc.title());
+                Elements images = doc.select("img[src~=(?i)\\.(png|jpe?g|gif)]");
+                for (Element image : images) {
+                    imageUrls.add(image.absUrl("src"));
+                    if (imageUrls.size() >= 20) {
+                        break;
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            handler.post(() -> {
+                for (int i = 0; i < imageUrls.size() && i<imageArray.length; i++) {
+                    imageArray[i] = imageUrls.get(i);
+                }
+                adapter.notifyDataSetChanged();
+            });
+        });
     }
 }
